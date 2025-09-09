@@ -1,3 +1,25 @@
+//  MIT License
+//
+//  Copyright (c) 2025 Dianna
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in all
+//  copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//  SOFTWARE.
+
 #include <iostream>
 #include <vector>
 #include <limits>
@@ -6,52 +28,34 @@
 #include "../header/utils.h"
 
 
-void handleAddBook(const DatabaseManager &db);
+void handleAddBook(const DatabaseManager &db);  // 添加图书
+void handleFindBook(const DatabaseManager &db); // 查找图书
+void handleUpdateBook(const DatabaseManager &db); // 更新图书信息
+void handleDeleteBook(const DatabaseManager &db);  // 删除图书
+void handleListAllBooks(const DatabaseManager &db);  // 列出所有图书
 
-void handleFindBook(const DatabaseManager &db);
+void handleBorrowBook(const DatabaseManager &db, const User &currentUser);  // 借阅图书
+void handleReturnBook(const DatabaseManager &db, const User &currentUser);  // 归还图书
+void handleRenewBook(const DatabaseManager &db, const User &currentUser);   // 续借图书
+void handleMyBorrowedBooks(const DatabaseManager &db, const User &currentUser);  // 普通用户查看借阅信息
 
-void handleUpdateBook(const DatabaseManager &db);
+void handleAddUser(const DatabaseManager &db);  // 管理员添加用户
+void handleStudentManagement(const DatabaseManager &db);  // 学生管理
+void handleListAllBorrowRecords(const DatabaseManager &db);  // 列出所有借阅记录
+void handleRegister(const DatabaseManager &db);  // 登记信息
+bool handleUpdateMyInfo(const DatabaseManager &db, User &currentUser);  // 普通用户更新自己的登记信息
 
-void handleDeleteBook(const DatabaseManager &db);
-
-void handleListAllBooks(const DatabaseManager &db);
-
-void handleBorrowBook(const DatabaseManager &db, const User &currentUser);
-
-void handleReturnBook(const DatabaseManager &db, const User &currentUser);
-
-void handleRenewBook(const DatabaseManager &db, const User &currentUser);
-
-void handleMyBorrowedBooks(const DatabaseManager &db, const User &currentUser);
-
-void handleAddUser(const DatabaseManager &db);
-
-void handleStudentManagement(const DatabaseManager &db);
-
-void handleListAllBorrowRecords(const DatabaseManager &db);
-
-void handleRegister(const DatabaseManager &db);
-
-bool handleUpdateMyInfo(const DatabaseManager &db, User &currentUser);
-
-void handleForgotPassword(const DatabaseManager &db);
-
-void handleAdminChangePassword(const DatabaseManager &db);
-
-void handleStudentChangePassword(const DatabaseManager &db, const User &currentUser);
-
-void handleSetRecoveryToken(const DatabaseManager &db, User &currentUser);
-
-void handleViewMyInfo(const User &currentUser);
+void handleForgotPassword(const DatabaseManager &db);    // 忘记密码/找回密码
+void handleAdminChangePassword(const DatabaseManager &db);  // 管理员用户帮助修改密码
+void handleStudentChangePassword(const DatabaseManager &db, const User &currentUser);  // 普通用户修改密码
+void handleSetRecoveryToken(const DatabaseManager &db, User &currentUser);  // 安全口令
+void handleViewMyInfo(const User &currentUser);  // 查看自己的信息
 
 
-void displayBooks(const std::vector<Book> &books);
-
-void displayBorrowRecords(const std::vector<BorrowRecord> &records);
-
-void displayStudents(const std::vector<User> &students);
-
-void displayFullBorrowRecords(const std::vector<FullBorrowRecord> &records);
+void displayBooks(const std::vector<Book> &books);  //  显示图书信息
+void displayBorrowRecords(const std::vector<BorrowRecord> &records);  // 显示借阅记录
+void displayStudents(const std::vector<User> &students);  // 显示普通永固/学生用户信息
+void displayFullBorrowRecords(const std::vector<FullBorrowRecord> &records);  // 显示全部借阅记录
 
 
 int pause() {
@@ -304,7 +308,7 @@ int main() {
     return 0;
 }
 
-// --- 业务逻辑函数实现 ---
+
 void displayBooks(const std::vector<Book> &books) {
     if (books.empty()) {
         std::cout << "未找到相关图书。\n";

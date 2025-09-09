@@ -1,12 +1,34 @@
-#include "../header/database.h"
-#include "../header/sha256.h"
+//  MIT License
+//
+//  Copyright (c) 2025 Dianna
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in all
+//  copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//  SOFTWARE.
+
+#include "./header/database.h"
+#include "./header/sha256.h"
 #include <iostream>
 #include <chrono>
 #include <sstream>
 #include <iomanip>
 
 DatabaseManager::DatabaseManager(std::string db_path) : db_path_(std::move(db_path)) {
-    // to do noting ..
+    // to do noting
 }
 
 DatabaseManager::~DatabaseManager() {
@@ -206,7 +228,6 @@ bool DatabaseManager::recoverPassword(const std::string &username, const std::st
 }
 
 
-// --- 图书管理 ---
 bool DatabaseManager::addBook(const Book &book) const {
     const  std::string sql =
             "INSERT INTO Books (isbn, title, author, publisher, category, totalCopies, availableCopies) VALUES (?, ?, ?, ?, ?, ?, ?);";
@@ -255,14 +276,13 @@ bool DatabaseManager::deleteBook(const std::string &isbn) const {
     return success;
 }
 
-// --- 图书查询 ---
 std::vector<Book> DatabaseManager::findBooks(const std::string &keyword, const std::string &sortBy) const {
     std::vector<Book> books;
     std::string safeSortBy = sortBy;
     if (safeSortBy != "title" && safeSortBy != "author" && safeSortBy != "isbn") {
         safeSortBy = "title"; // Default to a safe value
     }
-    std::string sql = "SELECT * FROM Books WHERE title LIKE ? OR author LIKE ? OR isbn LIKE ? ORDER BY " + safeSortBy +
+    const std::string sql = "SELECT * FROM Books WHERE title LIKE ? OR author LIKE ? OR isbn LIKE ? ORDER BY " + safeSortBy +
                       ";";
     sqlite3_stmt *stmt;
 
@@ -294,7 +314,7 @@ std::vector<Book> DatabaseManager::getAllBooks(const std::string &sortBy) const 
     return findBooks("", sortBy);
 }
 
-// --- 借阅管理 ---
+
 bool DatabaseManager::borrowBook(const std::string &userId, const std::string &isbn, int daysToBorrow) const {
     sqlite3_exec(db_, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
 
@@ -466,7 +486,7 @@ bool DatabaseManager::renewBook(int recordId, const std::string &userId) const {
 
 std::vector<BorrowRecord> DatabaseManager::getBorrowedBooksByUser(const std::string &userId) const {
     std::vector<BorrowRecord> records;
-    const char *sql = R"(
+    const auto sql = R"(
         SELECT r.recordId, r.userId, r.bookIsbn, b.title, r.borrowDate, r.dueDate, r.returnDate
         FROM BorrowingRecords r JOIN Books b ON r.bookIsbn = b.isbn
         WHERE r.userId = ? AND r.returnDate IS NULL;
@@ -545,7 +565,7 @@ std::vector<User> DatabaseManager::getAllStudents() const {
 
 std::vector<User> DatabaseManager::findStudents(const std::string &keyword) const {
     std::vector<User> students;
-    auto sql =
+    const auto sql =
             "SELECT id, username, name, college, className FROM Users WHERE (username LIKE ? OR id LIKE ? OR name LIKE ?) AND role = 'STUDENT' ORDER BY id;";
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return students;
@@ -574,7 +594,7 @@ std::vector<User> DatabaseManager::findStudents(const std::string &keyword) cons
 
 std::vector<FullBorrowRecord> DatabaseManager::getFullBorrowRecordsForUser(const std::string &userId) const {
     std::vector<FullBorrowRecord> records;
-    const char *sql = R"(
+    const auto sql = R"(
         SELECT r.recordId, u.id, u.name, u.college, u.className, b.title, r.borrowDate, r.dueDate,
                (CASE WHEN r.returnDate IS NULL AND date('now') > r.dueDate THEN 1 ELSE 0 END) as is_overdue
         FROM BorrowingRecords r
